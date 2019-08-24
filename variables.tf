@@ -12,10 +12,11 @@ variable "is_private_zone" {
 
 variable "records" {
   type = list(object({
-    ttl    = number
-    name   = string
-    values = list(string)
-    type   = string
+    ttl       = number
+    name      = string
+    values    = list(string)
+    type      = string
+    overwrite = bool
   }))
   description = "Records to add to the hosted zone"
 }

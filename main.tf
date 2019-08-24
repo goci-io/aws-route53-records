@@ -13,10 +13,11 @@ data "aws_route53_zone" "zone" {
 }
 
 resource "aws_route53_record" "record" {
-  count   = length(var.records)
-  zone_id = data.aws_route53_zone.zone.zone_id
-  name    = format("%s.%s", lookup(var.records[count.index], "name"), var.hosted_zone)
-  type    = lookup(var.records[count.index], "type")
-  ttl     = lookup(var.records[count.index], "ttl")
-  records = lookup(var.records[count.index], "values")
+  count           = length(var.records)
+  zone_id         = data.aws_route53_zone.zone.zone_id
+  name            = format("%s.%s", lookup(var.records[count.index], "name"), var.hosted_zone)
+  type            = lookup(var.records[count.index], "type")
+  ttl             = lookup(var.records[count.index], "ttl")
+  records         = lookup(var.records[count.index], "values")
+  allow_overwrite = lookup(var.records[count.index], "overwrite")
 }
