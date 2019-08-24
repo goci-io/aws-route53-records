@@ -3,6 +3,10 @@ terraform {
   backend "s3" {}
 }
 
+provider "aws" {
+  version = "~> 2.25"
+}
+
 data "aws_route53_zone" "zone" {
   name         = var.hosted_zone
   private_zone = var.is_private_zone
