@@ -1,9 +1,10 @@
 hosted_zone = "goci.io"
 records     = [
   {
-    name   = "github-verification"
-    ttl    = 600
-    type   = "TXT"
-    values = ["verification-code"]
+    name      = "github-verification"
+    ttl       = 600
+    type      = "TXT"
+    values    = ["verification-code"]
+    overwrite = true
   }
 ]
