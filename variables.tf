@@ -19,9 +19,3 @@ variable "records" {
   }))
   description = "Records to add to the hosted zone"
 }
-
-variable "tf_provider_aws_version" {
-  type        = string
-  default     = "~> 2.24"
-  description = "The version of the Terraform AWS provider"
-}
