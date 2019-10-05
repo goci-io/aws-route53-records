@@ -11,7 +11,7 @@ variable "is_private_zone" {
 }
 
 variable "records" {
-  type        = list()
+  type        = list
   description = "Objects of records to add to the hosted zone"
 }
 
