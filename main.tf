@@ -22,22 +22,26 @@ data "terraform_remote_state" "alias" {
 }
 
 resource "aws_route53_record" "record" {
-  count           = length(var.records)
+  count           = var.alias_module_state == "" ? length(var.records) : 0
   zone_id         = data.aws_route53_zone.zone.zone_id
   name            = format("%s.%s", lookup(var.records[count.index], "name"), var.hosted_zone)
   type            = lookup(var.records[count.index], "type", "A")
   ttl             = lookup(var.records[count.index], "ttl", 600)
   records         = lookup(var.records[count.index], "values", [])
   allow_overwrite = lookup(var.records[count.index], "overwrite", true)
+}
 
-  dynamic "alias" {
-    iterator = alias
-    for_each = var.alias_module_state == "" && lookup(var.records[count.index], "alias", "") == "" ? [] : [1]
+resource "aws_route53_record" "alias_record" {
+  count           = var.alias_module_state == "" ? 0 : 1
+  zone_id         = data.aws_route53_zone.zone.zone_id
+  name            = format("%s.%s", lookup(var.records[count.index], "name"), var.hosted_zone)
+  type            = lookup(var.records[count.index], "type", "A")
+  allow_overwrite = lookup(var.records[count.index], "overwrite", true)
 
-    content {
-      name                   = lookup(var.records[count.index], "alias", join("", data.terraform_remote_state.alias.*.outputs.dns_name))
-      zone_id                = lookup(var.records[count.index], "alias_zone", join("", data.terraform_remote_state.alias.*.outputs.zone_id))
-      evaluate_target_health = true
-    }
+  alias {
+    name                   = lookup(var.records[count.index], "alias", join("", data.terraform_remote_state.alias.*.outputs.dns_name))
+    zone_id                = lookup(var.records[count.index], "alias_zone", join("", data.terraform_remote_state.alias.*.outputs.zone_id))
+    evaluate_target_health = true
   }
 }
+
