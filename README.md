@@ -4,6 +4,24 @@
 
 This module provisions new records in an existing Route53 Hosted zone.
 
+## Usage
+
+```hcl
+module "zone" {
+  source      = "git::https://github.com/goci-io/aws-route53-records.git?ref=tags/<latest-version>"
+  hosted_zone = "goci.io"
+  records     = [
+    {
+      ttl       = 300
+      name      = "confirmation-dns-record"
+      values    = ["confirmation-value"]
+      type      = "TXT"
+      overwrite = true
+    }
+  ]
+}
+```
+
 ## Configuration
 
 | Name | Description | Default |
