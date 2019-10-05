@@ -23,5 +23,6 @@ variable "alias_module_state" {
 
 variable "tf_bucket" {
   type        = string
+  default     = ""
   description = "The S3 Bucket to use to fetch state information from"
 }
