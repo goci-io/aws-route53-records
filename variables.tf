@@ -11,12 +11,17 @@ variable "is_private_zone" {
 }
 
 variable "records" {
-  type = list(object({
-    ttl       = number
-    name      = string
-    values    = list(string)
-    type      = string
-    overwrite = bool
-  }))
-  description = "Records to add to the hosted zone"
+  type        = list()
+  description = "Objects of records to add to the hosted zone"
+}
+
+variable "alias_module_state" {
+  type        = string
+  default     = ""
+  description = "State reference to a module to source alias information from (only one). Must expose zone_id and dns_name outputs."
+}
+
+variable "tf_bucket" {
+  type        = string
+  description = "The S3 Bucket to use to fetch state information from"
 }
