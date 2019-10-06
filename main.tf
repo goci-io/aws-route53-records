@@ -22,8 +22,8 @@ data "terraform_remote_state" "alias" {
 }
 
 locals {
-  records       = [for record in var.records : lookup(record, "alias", "") == ""]
-  alias_records = [for record in var.records : lookup(record, "alias", "") != ""]
+  records       = [for record in var.records : if lookup(record, "alias", "") == ""]
+  alias_records = [for record in var.records : if lookup(record, "alias", "") != ""]
 }
 
 resource "aws_route53_record" "record" {
