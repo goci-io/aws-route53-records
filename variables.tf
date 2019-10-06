@@ -12,11 +12,13 @@ variable "is_private_zone" {
 
 variable "records" {
   type        = list
+  default     = []
   description = "Objects of records to add to the hosted zone"
 }
 
 variable "alias_records" {
   type        = list
+  default     = []
   description = "Objects of alias records to add to the hosted zone"
 }
 
