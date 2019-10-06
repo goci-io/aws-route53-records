@@ -15,6 +15,11 @@ variable "records" {
   description = "Objects of records to add to the hosted zone"
 }
 
+variable "alias_records" {
+  type        = list
+  description = "Objects of alias records to add to the hosted zone"
+}
+
 variable "alias_module_state" {
   type        = string
   default     = ""
