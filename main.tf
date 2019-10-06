@@ -21,26 +21,31 @@ data "terraform_remote_state" "alias" {
   }
 }
 
+locals {
+  records       = [for record in var.records : lookup(record, "alias", "") == ""]
+  alias_records = [for record in var.records : lookup(record, "alias", "") != ""]
+}
+
 resource "aws_route53_record" "record" {
-  count           = var.alias_module_state == "" ? length(var.records) : 0
+  count           = length(local.records)
   zone_id         = data.aws_route53_zone.zone.zone_id
-  name            = format("%s.%s", lookup(var.records[count.index], "name"), var.hosted_zone)
-  type            = lookup(var.records[count.index], "type", "A")
-  ttl             = lookup(var.records[count.index], "ttl", 600)
-  records         = lookup(var.records[count.index], "values", [])
-  allow_overwrite = lookup(var.records[count.index], "overwrite", true)
+  name            = format("%s.%s", lookup(local.records[count.index], "name"), var.hosted_zone)
+  type            = lookup(local.records[count.index], "type", "A")
+  ttl             = lookup(local.records[count.index], "ttl", 600)
+  records         = lookup(local.records[count.index], "values", [])
+  allow_overwrite = lookup(local.records[count.index], "overwrite", true)
 }
 
 resource "aws_route53_record" "alias_record" {
-  count           = var.alias_module_state == "" ? 0 : 1
+  count           = length(local.alias_records)
   zone_id         = data.aws_route53_zone.zone.zone_id
-  name            = format("%s.%s", lookup(var.records[count.index], "name"), var.hosted_zone)
-  type            = lookup(var.records[count.index], "type", "A")
-  allow_overwrite = lookup(var.records[count.index], "overwrite", true)
+  name            = format("%s.%s", lookup(local.alias_records[count.index], "name"), var.hosted_zone)
+  type            = lookup(local.alias_records[count.index], "type", "A")
+  allow_overwrite = lookup(local.alias_records[count.index], "overwrite", true)
 
   alias {
-    name                   = lookup(var.records[count.index], "alias", join("", data.terraform_remote_state.alias.*.outputs.dns_name))
-    zone_id                = lookup(var.records[count.index], "alias_zone", join("", data.terraform_remote_state.alias.*.outputs.zone_id))
+    name                   = lookup(local.alias_records[count.index], "alias", join("", data.terraform_remote_state.alias.*.outputs.dns_name))
+    zone_id                = lookup(local.alias_records[count.index], "alias_zone", join("", data.terraform_remote_state.alias.*.outputs.zone_id))
     evaluate_target_health = true
   }
 }
