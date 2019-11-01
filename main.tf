@@ -7,12 +7,13 @@ terraform {
 }
 
 data "aws_route53_zone" "zone" {
+  count        = var.enabled ? 1 : 0
   name         = var.hosted_zone
   private_zone = var.is_private_zone
 }
 
 data "terraform_remote_state" "alias" {
-  count   = var.alias_module_state == "" ? 0 : 1
+  count   = var.alias_module_state == "" ? 0 : var.enabled ? 1 : 0
   backend = "s3"
 
   config = {
@@ -21,9 +22,13 @@ data "terraform_remote_state" "alias" {
   }
 }
 
+locals {
+  zone_id = join("", data.aws_route53_zone.zone.*.zone_id)
+}
+
 resource "aws_route53_record" "record" {
-  count           = length(var.records)
-  zone_id         = data.aws_route53_zone.zone.zone_id
+  count           = var.enabled ? length(var.records) : 0
+  zone_id         = local.zone_id
   name            = format("%s.%s", lookup(var.records[count.index], "name"), var.hosted_zone)
   type            = lookup(var.records[count.index], "type", "A")
   ttl             = lookup(var.records[count.index], "ttl", 600)
@@ -32,8 +37,8 @@ resource "aws_route53_record" "record" {
 }
 
 resource "aws_route53_record" "alias_record" {
-  count           = length(var.alias_records)
-  zone_id         = data.aws_route53_zone.zone.zone_id
+  count           = var.enabled ? length(var.alias_records) : 0
+  zone_id         = local.zone_id
   name            = format("%s.%s", lookup(var.alias_records[count.index], "name"), var.hosted_zone)
   type            = lookup(var.alias_records[count.index], "type", "A")
   allow_overwrite = lookup(var.alias_records[count.index], "overwrite", true)

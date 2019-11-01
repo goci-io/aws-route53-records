@@ -33,3 +33,10 @@ variable "tf_bucket" {
   default     = ""
   description = "The S3 Bucket to use to fetch state information from"
 }
+
+variable "enabled" {
+  type        = bool
+  default     = true
+  description = "Disables the module if necessary (no count on modules)"
+}
+
