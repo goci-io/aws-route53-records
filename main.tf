@@ -39,7 +39,7 @@ resource "aws_route53_record" "record" {
 resource "aws_route53_record" "alias_record" {
   count           = var.enabled ? length(var.alias_records) : 0
   zone_id         = local.zone_id
-  name            = format("%s.%s", lookup(var.alias_records[count.index], "name"), var.hosted_zone)
+  name            = lookup(var.alias_records[count.index], "name") == "" ? var.hosted_zone : format("%s.%s", lookup(var.alias_records[count.index], "name"), var.hosted_zone)
   type            = lookup(var.alias_records[count.index], "type", "A")
   allow_overwrite = lookup(var.alias_records[count.index], "overwrite", true)
 
