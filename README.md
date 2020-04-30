@@ -2,7 +2,7 @@
 
 **Maintained by [@goci-io/prp-terraform](https://github.com/orgs/goci-io/teams/prp-terraform)**
 
-![Terraform Validate](https://github.com/goci-io/aws-route53-records/workflows/Terraform%20Validate/badge.svg)
+![terraform](https://github.com/goci-io/aws-route53-records/workflows/terraform/badge.svg?branch=master)
 
 This module provisions new records in an existing Route53 Hosted zone.
 
