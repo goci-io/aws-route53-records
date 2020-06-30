@@ -39,7 +39,7 @@ data "null_data_source" "record_fqdns" {
 resource "aws_route53_record" "record" {
   count           = var.enabled ? length(var.records) : 0
   zone_id         = local.zone_id
-  name            = data.null_data_source.record_fqdns.outputs.full ? data.null_data_source.record_fqdns.outputs.name : data.null_data_source.record_fqdns.outputs.fqdn
+  name            = data.null_data_source.record_fqdns[0].outputs.full ? data.null_data_source.record_fqdns[0].outputs.name : data.null_data_source.record_fqdns[0].outputs.fqdn
   type            = lookup(var.records[count.index], "type", "A")
   ttl             = lookup(var.records[count.index], "ttl", 600)
   records         = lookup(var.records[count.index], "values", [])
@@ -59,7 +59,7 @@ data "null_data_source" "alias_fqdns" {
 resource "aws_route53_record" "alias_record" {
   count           = var.enabled ? length(var.alias_records) : 0
   zone_id         = local.zone_id
-  name            = data.null_data_source.alias_fqdns.outputs.full ? data.null_data_source.alias_fqdns.outputs.name : data.null_data_source.alias_fqdns.outputs.fqdn
+  name            = data.null_data_source.alias_fqdns[count.index].outputs.full ? data.null_data_source.alias_fqdns[0].outputs.name : data.null_data_source.alias_fqdns[0].outputs.fqdn
   type            = lookup(var.alias_records[count.index], "type", "A")
   allow_overwrite = lookup(var.alias_records[count.index], "overwrite", true)
 
