@@ -26,20 +26,40 @@ locals {
   zone_id = join("", data.aws_route53_zone.zone.*.zone_id)
 }
 
+data "null_data_source" "record_fqdns" {
+  count = var.enabled ? length(var.records) : 0
+
+  inputs = {
+    name = lookup(var.records[count.index], "name", "")
+    full = length(regexall("${var.hosted_zone}.?$", lookup(var.records[count.index], "name", ""))) > 0
+    fqdn = lookup(var.records[count.index], "name", "") == "" ? var.hosted_zone : format("%s.%s", lookup(var.records[count.index], "name"), var.hosted_zone)
+  }
+}
+
 resource "aws_route53_record" "record" {
   count           = var.enabled ? length(var.records) : 0
   zone_id         = local.zone_id
-  name            = lookup(var.records[count.index], "name", "") == "" ? var.hosted_zone : format("%s.%s", lookup(var.records[count.index], "name"), var.hosted_zone)
+  name            = data.null_data_source.record_fqdns[0].outputs.full ? data.null_data_source.record_fqdns[0].outputs.name : data.null_data_source.record_fqdns[0].outputs.fqdn
   type            = lookup(var.records[count.index], "type", "A")
   ttl             = lookup(var.records[count.index], "ttl", 600)
   records         = lookup(var.records[count.index], "values", [])
   allow_overwrite = lookup(var.records[count.index], "overwrite", true)
 }
 
+data "null_data_source" "alias_fqdns" {
+  count = var.enabled ? length(var.alias_records) : 0
+
+  inputs = {
+    name = lookup(var.alias_records[count.index], "name", "")
+    full = length(regexall("${var.hosted_zone}.?$", lookup(var.alias_records[count.index], "name", ""))) > 0
+    fqdn = lookup(var.alias_records[count.index], "name", "") == "" ? var.hosted_zone : format("%s.%s", lookup(var.alias_records[count.index], "name"), var.hosted_zone)
+  }
+}
+
 resource "aws_route53_record" "alias_record" {
   count           = var.enabled ? length(var.alias_records) : 0
   zone_id         = local.zone_id
-  name            = lookup(var.alias_records[count.index], "name", "") == "" ? var.hosted_zone : format("%s.%s", lookup(var.alias_records[count.index], "name"), var.hosted_zone)
+  name            = data.null_data_source.alias_fqdns[count.index].outputs.full ? data.null_data_source.alias_fqdns[0].outputs.name : data.null_data_source.alias_fqdns[0].outputs.fqdn
   type            = lookup(var.alias_records[count.index], "type", "A")
   allow_overwrite = lookup(var.alias_records[count.index], "overwrite", true)
 
