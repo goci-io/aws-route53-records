@@ -31,8 +31,8 @@ data "null_data_source" "record_fqdns" {
 
   inputs = {
     name = lookup(var.records[count.index], "name", "")
-    fqdn = format("%s.%s", lookup(var.records[count.index], "name", ""), var.hosted_zone)
-    full = length(regexall("${var.hosted_zone}.?$", lookup(var.records[count.index], "name", ""))) < 1
+    full = length(regexall("${var.hosted_zone}.?$", lookup(var.records[count.index], "name", ""))) > 0
+    fqdn = lookup(var.records[count.index], "name", "") == "" ? var.hosted_zone : format("%s.%s", lookup(var.records[count.index], "name"), var.hosted_zone)
   }
 }
 
@@ -51,8 +51,8 @@ data "null_data_source" "alias_fqdns" {
 
   inputs = {
     name = lookup(var.alias_records[count.index], "name", "")
-    fqdn = format("%s.%s", lookup(var.alias_records[count.index], "name", ""), var.hosted_zone)
-    full = length(regexall("${var.hosted_zone}.?$", lookup(var.alias_records[count.index], "name", ""))) < 1
+    full = length(regexall("${var.hosted_zone}.?$", lookup(var.alias_records[count.index], "name", ""))) > 0
+    fqdn = lookup(var.alias_records[count.index], "name", "") == "" ? var.hosted_zone : format("%s.%s", lookup(var.alias_records[count.index], "name"), var.hosted_zone)
   }
 }
 
